@@ -1067,7 +1067,7 @@ function PetCardImpl({
       ) : null}
 
       {usesProfilePinHover ? (
-        <div className="pointer-events-none absolute top-16 right-4 z-20 flex flex-col items-center gap-2 opacity-0 transition group-has-[[aria-expanded=true]]:pointer-events-auto group-has-[[aria-expanded=true]]:opacity-100 group-has-[:focus-visible]:pointer-events-auto group-has-[:focus-visible]:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100">
+        <div className="pointer-events-none absolute top-16 right-4 z-20 flex flex-col items-center gap-2 opacity-0 transition [@media(hover:none)]:pointer-events-auto [@media(hover:none)]:opacity-100 group-has-[[aria-expanded=true]]:pointer-events-auto group-has-[[aria-expanded=true]]:opacity-100 group-has-[:focus-visible]:pointer-events-auto group-has-[:focus-visible]:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100">
           {pinState ? (
             <ProfilePinButton
               slug={pet.slug}
