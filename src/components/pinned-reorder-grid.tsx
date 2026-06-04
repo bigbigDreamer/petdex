@@ -38,6 +38,7 @@ type PinnedReorderGridProps = {
   petStateCount: number;
   hideAuthor?: boolean;
   onPinChange?: (slug: string, isPinned: boolean) => void;
+  onOrderChange?: (slugs: string[]) => void;
 };
 
 type SaveState = "idle" | "saving" | "saved" | "error";
@@ -69,6 +70,7 @@ export function PinnedReorderGrid({
   petStateCount,
   hideAuthor,
   onPinChange,
+  onOrderChange,
 }: PinnedReorderGridProps) {
   const t = useTranslations("pinnedReorder");
   const orderRef = useRef<PetWithMetrics[]>(pets);
@@ -145,6 +147,7 @@ export function PinnedReorderGrid({
         throw new Error(body.error ?? `save failed (${res.status})`);
       }
       setSavedSlugs(slugs);
+      onOrderChange?.(slugs);
       setSaveState("saved");
     } catch (err) {
       setSaveState("error");

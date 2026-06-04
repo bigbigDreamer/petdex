@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -16,8 +17,23 @@ import type { Submission } from "@/components/my-pets-view";
 import type { OwnerCollection } from "@/components/owner-collections-manager";
 import { PetCard } from "@/components/pet-gallery";
 import { PetSprite } from "@/components/pet-sprite";
-import { PinnedReorderGrid } from "@/components/pinned-reorder-grid";
 import { ProfileTabs } from "@/components/profile-tabs";
+
+type OwnerPinnedReorderGridProps = {
+  pets: PetWithMetrics[];
+  petStateCount: number;
+  hideAuthor?: boolean;
+  onPinChange?: (slug: string, isPinned: boolean) => void;
+  onOrderChange?: (slugs: string[]) => void;
+};
+
+const OwnerPinnedReorderGrid = dynamic<OwnerPinnedReorderGridProps>(
+  () =>
+    import("@/components/pinned-reorder-grid").then(
+      (mod) => mod.PinnedReorderGrid,
+    ),
+  { ssr: false },
+);
 
 type ProfilePinningSurfaceProps = {
   isOwner: boolean;
@@ -85,15 +101,24 @@ export function ProfilePinningSurface({
     [isOwner],
   );
 
+  const handlePinOrderChange = useCallback(
+    (slugs: string[]) => {
+      if (!isOwner) return;
+      setOptimisticPinnedSlugs(slugs);
+    },
+    [isOwner],
+  );
+
   return (
     <>
       {featuredPets.length > 0 ? (
         isOwner ? (
-          <PinnedReorderGrid
+          <OwnerPinnedReorderGrid
             pets={featuredPets}
             petStateCount={petStates.length}
             hideAuthor
             onPinChange={handlePinChange}
+            onOrderChange={handlePinOrderChange}
           />
         ) : (
           <div className="space-y-4">

@@ -71,11 +71,32 @@ describe("optimistic lightweight actions", () => {
 
   it("keeps a single owner-pinned pet in the compact pinned grid", () => {
     expect(profilePinningSurfaceSource).toContain("isOwner ? (");
-    expect(profilePinningSurfaceSource).toContain("<PinnedReorderGrid");
+    expect(profilePinningSurfaceSource).toContain("<OwnerPinnedReorderGrid");
     expect(profilePinningSurfaceSource).not.toContain(
       "isOwner && featuredPets.length >= 2",
     );
     expect(pinnedReorderGridSource).not.toContain('? "relative"');
+  });
+
+  it("keeps owner reorder code out of the static profile surface import path", () => {
+    expect(profilePinningSurfaceSource).toContain(
+      "dynamic<OwnerPinnedReorderGridProps>",
+    );
+    expect(profilePinningSurfaceSource).toContain(
+      'import("@/components/pinned-reorder-grid")',
+    );
+    expect(profilePinningSurfaceSource).not.toContain(
+      "import { PinnedReorderGrid }",
+    );
+  });
+
+  it("syncs saved pinned reorder back to the parent optimistic list", () => {
+    expect(profilePinningSurfaceSource).toContain("handlePinOrderChange");
+    expect(profilePinningSurfaceSource).toContain(
+      "onOrderChange={handlePinOrderChange}",
+    );
+    expect(pinnedReorderGridSource).toContain("onOrderChange?:");
+    expect(pinnedReorderGridSource).toContain("onOrderChange?.(slugs)");
   });
 
   it("does not duplicate favorite state with the old caught dot", () => {
