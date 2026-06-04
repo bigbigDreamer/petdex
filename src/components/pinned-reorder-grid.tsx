@@ -32,6 +32,10 @@ import type { PetWithMetrics } from "@/lib/pets";
 import { MAX_PINNED_PETS } from "@/lib/profiles";
 
 import { PetCard } from "@/components/pet-gallery";
+import {
+  hasSamePinnedOrder,
+  shouldResetPinnedOrderFromProps,
+} from "@/components/profile-pinning-state";
 
 type PinnedReorderGridProps = {
   pets: PetWithMetrics[];
@@ -78,6 +82,7 @@ export function PinnedReorderGrid({
 }: PinnedReorderGridProps) {
   const t = useTranslations("pinnedReorder");
   const orderRef = useRef<PetWithMetrics[]>(pets);
+  const propSlugsRef = useRef<string[]>(pets.map((pet) => pet.slug));
   const [order, setOrder] = useState<PetWithMetrics[]>(pets);
   const [savedSlugs, setSavedSlugs] = useState<string[]>(
     pets.map((pet) => pet.slug),
@@ -97,6 +102,20 @@ export function PinnedReorderGrid({
 
   useEffect(() => {
     const slugs = pets.map((pet) => pet.slug);
+    const previousPropSlugs = propSlugsRef.current;
+    const currentOrderSlugs = orderRef.current.map((pet) => pet.slug);
+    const propOrderChanged = !hasSamePinnedOrder(previousPropSlugs, slugs);
+    propSlugsRef.current = slugs;
+    if (
+      !shouldResetPinnedOrderFromProps({
+        previousPropSlugs,
+        nextPropSlugs: slugs,
+        currentOrderSlugs,
+      })
+    ) {
+      if (propOrderChanged) setSavedSlugs(slugs);
+      return;
+    }
     orderRef.current = pets;
     setOrder(pets);
     setSavedSlugs(slugs);

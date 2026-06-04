@@ -23,3 +23,22 @@ export function applyPinnedOrderChange(
   const remainingSlugs = currentSlugs.filter((slug) => !orderedSet.has(slug));
   return [...orderedCurrentSlugs, ...remainingSlugs];
 }
+
+export function hasSamePinnedOrder(left: string[], right: string[]): boolean {
+  return (
+    left.length === right.length && left.every((slug, i) => slug === right[i])
+  );
+}
+
+export function shouldResetPinnedOrderFromProps({
+  previousPropSlugs,
+  nextPropSlugs,
+  currentOrderSlugs,
+}: {
+  previousPropSlugs: string[];
+  nextPropSlugs: string[];
+  currentOrderSlugs: string[];
+}): boolean {
+  if (hasSamePinnedOrder(previousPropSlugs, nextPropSlugs)) return false;
+  return !hasSamePinnedOrder(currentOrderSlugs, nextPropSlugs);
+}
