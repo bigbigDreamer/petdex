@@ -177,6 +177,7 @@ export function ProfileTabs(props: ProfileTabsProps) {
           pinnedSet={pinnedSet}
           pinnedCount={pinnedCount}
           maxPins={pinning?.maxPins ?? null}
+          onPinChange={pinning?.onPinChange}
           isZh={isZh}
           approvedLabel={(count: number) => t("approvedSection", { count })}
         />
@@ -211,6 +212,7 @@ function PetsPanel({
   pinnedSet,
   pinnedCount,
   maxPins,
+  onPinChange,
   isZh,
   approvedLabel,
 }: {
@@ -223,6 +225,7 @@ function PetsPanel({
   pinnedSet: Set<string> | null;
   pinnedCount: number;
   maxPins: number | null;
+  onPinChange?: (slug: string, isPinned: boolean) => void;
   isZh: boolean;
   approvedLabel: (count: number) => string;
 }) {
@@ -294,7 +297,7 @@ function PetsPanel({
                             pinnedCount,
                             maxPins,
                             onPinChange: (isPinned) =>
-                              pinning.onPinChange?.(pet.slug, isPinned),
+                              onPinChange?.(pet.slug, isPinned),
                           }
                         : undefined
                     }

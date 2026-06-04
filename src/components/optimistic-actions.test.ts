@@ -21,6 +21,11 @@ const profilePinningSurfaceSource = readFileSync(
   "utf8",
 );
 
+const profileTabsSource = readFileSync(
+  new URL("./profile-tabs.tsx", import.meta.url),
+  "utf8",
+);
+
 describe("optimistic lightweight actions", () => {
   it("keeps card favorites instant without a loading spinner", () => {
     expect(petCardFooterSource).not.toContain("Loader2");
@@ -54,6 +59,9 @@ describe("optimistic lightweight actions", () => {
     expect(profilePinningSurfaceSource).toContain(
       "onPinChange: handlePinChange",
     );
+    expect(profileTabsSource).toContain("onPinChange={pinning?.onPinChange}");
+    expect(profileTabsSource).toContain("onPinChange?.(pet.slug, isPinned)");
+    expect(profileTabsSource).not.toContain("pinning.onPinChange?.");
   });
 
   it("does not duplicate favorite state with the old caught dot", () => {
