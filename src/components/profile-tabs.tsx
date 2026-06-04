@@ -53,6 +53,7 @@ export type ProfileTabsProps = {
   pinning?: {
     pinnedSlugs: string[];
     maxPins: number;
+    onPinChange?: (slug: string, isPinned: boolean) => void;
   } | null;
   // Owner-only: every collection this user owns (personal + featured).
   // When present and isOwner, the Collections tab swaps to the multi
@@ -292,6 +293,8 @@ function PetsPanel({
                             isPinned: pinnedSet.has(pet.slug),
                             pinnedCount,
                             maxPins,
+                            onPinChange: (isPinned) =>
+                              pinning.onPinChange?.(pet.slug, isPinned),
                           }
                         : undefined
                     }

@@ -14,12 +14,14 @@ export function ProfilePinButton({
   pinnedCount,
   maxPins,
   appearance = "default",
+  onOptimisticChange,
 }: {
   slug: string;
   isPinned: boolean;
   pinnedCount: number;
   maxPins: number;
   appearance?: "default" | "subtle";
+  onOptimisticChange?: (isPinned: boolean) => void;
 }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
@@ -47,6 +49,7 @@ export function ProfilePinButton({
     const seq = pinRequestSeq.current + 1;
     pinRequestSeq.current = seq;
     setOptimisticPinned(nextPinned);
+    onOptimisticChange?.(nextPinned);
     try {
       const body = nextPinned ? { pin: { slug } } : { unpin: { slug } };
       const res = await fetch("/api/profile", {
@@ -55,7 +58,10 @@ export function ProfilePinButton({
         body: JSON.stringify(body),
       });
       if (!res.ok) {
-        if (pinRequestSeq.current === seq) setOptimisticPinned(previousPinned);
+        if (pinRequestSeq.current === seq) {
+          setOptimisticPinned(previousPinned);
+          onOptimisticChange?.(previousPinned);
+        }
         const j = (await res.json().catch(() => null)) as {
           error?: string;
         } | null;
@@ -70,7 +76,10 @@ export function ProfilePinButton({
         startTransition(() => router.refresh());
       }
     } catch {
-      if (pinRequestSeq.current === seq) setOptimisticPinned(previousPinned);
+      if (pinRequestSeq.current === seq) {
+        setOptimisticPinned(previousPinned);
+        onOptimisticChange?.(previousPinned);
+      }
       alert("Failed: network error");
     }
   }

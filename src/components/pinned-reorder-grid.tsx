@@ -37,6 +37,7 @@ type PinnedReorderGridProps = {
   pets: PetWithMetrics[];
   petStateCount: number;
   hideAuthor?: boolean;
+  onPinChange?: (slug: string, isPinned: boolean) => void;
 };
 
 type SaveState = "idle" | "saving" | "saved" | "error";
@@ -67,6 +68,7 @@ export function PinnedReorderGrid({
   pets,
   petStateCount,
   hideAuthor,
+  onPinChange,
 }: PinnedReorderGridProps) {
   const t = useTranslations("pinnedReorder");
   const orderRef = useRef<PetWithMetrics[]>(pets);
@@ -287,6 +289,7 @@ export function PinnedReorderGrid({
                 petStateCount={petStateCount}
                 pinnedCount={order.length}
                 hideAuthor={hideAuthor}
+                onPinChange={onPinChange}
               />
             ))}
           </div>
@@ -326,6 +329,7 @@ type SortablePinnedPetProps = {
   petStateCount: number;
   pinnedCount: number;
   hideAuthor?: boolean;
+  onPinChange?: (slug: string, isPinned: boolean) => void;
 };
 
 function SortablePinnedPet({
@@ -336,6 +340,7 @@ function SortablePinnedPet({
   petStateCount,
   pinnedCount,
   hideAuthor,
+  onPinChange,
 }: SortablePinnedPetProps) {
   const {
     attributes,
@@ -370,7 +375,12 @@ function SortablePinnedPet({
           index={index}
           stateCount={petStateCount}
           hideAuthor={hideAuthor}
-          pinState={{ isPinned: true, pinnedCount, maxPins: MAX_PINNED_PETS }}
+          pinState={{
+            isPinned: true,
+            pinnedCount,
+            maxPins: MAX_PINNED_PETS,
+            onPinChange: (isPinned) => onPinChange?.(pet.slug, isPinned),
+          }}
           actionMode="profilePinHover"
         />
       </div>

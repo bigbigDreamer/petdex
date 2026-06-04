@@ -777,6 +777,8 @@ export type PetCardPinState = {
   pinnedCount: number;
   /** Hard cap for the owner. Same constant the editor uses. */
   maxPins: number;
+  /** Mirrors the button's optimistic state into parent-owned layouts. */
+  onPinChange?: (isPinned: boolean) => void;
 };
 
 type PetCardProps = {
@@ -1073,6 +1075,7 @@ function PetCardImpl({
               pinnedCount={pinState.pinnedCount}
               maxPins={pinState.maxPins}
               appearance="subtle"
+              onOptimisticChange={pinState.onPinChange}
             />
           ) : null}
           <PetActionMenu
@@ -1098,6 +1101,7 @@ function PetCardImpl({
                 isPinned={pinState.isPinned}
                 pinnedCount={pinState.pinnedCount}
                 maxPins={pinState.maxPins}
+                onOptimisticChange={pinState.onPinChange}
               />
             </div>
           ) : null}
