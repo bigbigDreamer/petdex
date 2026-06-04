@@ -11,6 +11,11 @@ const profilePinButtonSource = readFileSync(
   "utf8",
 );
 
+const petGallerySource = readFileSync(
+  new URL("./pet-gallery.tsx", import.meta.url),
+  "utf8",
+);
+
 describe("optimistic lightweight actions", () => {
   it("keeps card favorites instant without a loading spinner", () => {
     expect(petCardFooterSource).not.toContain("Loader2");
@@ -25,5 +30,11 @@ describe("optimistic lightweight actions", () => {
     expect(profilePinButtonSource).toContain("useState(isPinned)");
     expect(profilePinButtonSource).toContain("setOptimisticPinned(nextPinned)");
     expect(profilePinButtonSource).toContain("pinRequestSeq.current === seq");
+  });
+
+  it("does not duplicate favorite state with the old caught dot", () => {
+    expect(petGallerySource).not.toContain("CheckCircle2");
+    expect(petGallerySource).not.toContain("caughtTitle");
+    expect(petGallerySource).not.toContain("caught={");
   });
 });

@@ -11,15 +11,7 @@ import {
   useState,
 } from "react";
 
-import {
-  Check,
-  CheckCircle2,
-  Loader2,
-  Plus,
-  Search,
-  Sparkles,
-  X,
-} from "lucide-react";
+import { Check, Loader2, Plus, Search, Sparkles, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
 import type { PublicFeedAd } from "@/lib/ads/queries";
@@ -34,7 +26,6 @@ import { cn } from "@/lib/utils";
 import { track } from "@/lib/vercel-analytics";
 
 import { FeedAdSlot } from "@/components/ads/feed-ad-slot";
-import { useHeaderState } from "@/components/header-state-provider";
 import { PetActionMenu } from "@/components/pet-action-menu";
 import { PetCardFooter } from "@/components/pet-card-footer";
 import { PetSprite } from "@/components/pet-sprite";
@@ -147,13 +138,9 @@ export function PetGallery({
   const [activeBatches, setActiveBatches] = useState<Set<string>>(new Set());
   const [sort, setSort] = useState<SortKey>("alpha");
   const [sortTouched, setSortTouched] = useState(false);
-  // The home page no longer ships caughtSlugs server-side — that would
-  // make every SSR render per-visitor and kill ISR. We pull the caught
-  // slug set from the shared HeaderStateProvider (one polled aggregate
-  // instead of per-component fetch) so the "caught" highlight still
-  // works for signed-in users without an extra Edge Request per page.
-  const headerCaught = useHeaderState().state.caught;
-  const caughtSet = new Set(caughtSlugs ?? headerCaught);
+  // Kept for call-site compatibility; card favorite state is already shown by
+  // the heart button, so we no longer duplicate it with a caught dot.
+  void caughtSlugs;
 
   const [pets, setPets] = useState<PetWithMetrics[]>(initial.pets);
   const [total, setTotal] = useState<number>(initial.total);
@@ -590,7 +577,6 @@ export function PetGallery({
                 index={index}
                 stateCount={stateCount}
                 dexNumber={dexMap?.[pet.slug] ?? null}
-                caught={caughtSet.has(pet.slug)}
               />
               {ad ? <FeedAdSlot ad={ad} /> : null}
             </Fragment>
@@ -795,7 +781,6 @@ export type PetCardPinState = {
 type PetCardProps = {
   pet: PetWithMetrics;
   index: number;
-  caught?: boolean;
   /**
    * Optional. Kept on the type so older call sites that still pass
    * stateCount don't break. The card no longer renders a 'states'
@@ -847,7 +832,6 @@ function PetCardImpl({
   pet,
   index,
   dexNumber,
-  caught,
   ownerActions,
   statusOverlay,
   pinState,
@@ -918,11 +902,6 @@ function PetCardImpl({
             <span className="font-mono text-[11px] tracking-[0.22em] text-muted-3 uppercase">
               No. {dexLabel}
             </span>
-            {caught ? (
-              <span title={t("caughtTitle")} className="text-emerald-600">
-                <CheckCircle2 className="size-4 fill-current" />
-              </span>
-            ) : null}
           </div>
         </div>
 
