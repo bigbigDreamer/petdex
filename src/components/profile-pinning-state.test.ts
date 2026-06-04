@@ -3,6 +3,7 @@ import { describe, expect, it } from "bun:test";
 import {
   applyPinChangeToPinnedSlugs,
   applyPinnedOrderChange,
+  refreshPinnedOrderItems,
   shouldResetPinnedOrderFromProps,
 } from "@/components/profile-pinning-state";
 
@@ -54,5 +55,24 @@ describe("profile pinning state", () => {
         currentOrderSlugs: ["corsair", "boba", "quack"],
       }),
     ).toBe(true);
+  });
+
+  it("refreshes pinned item data without resetting the current order", () => {
+    const currentOrder = [
+      { slug: "corsair", name: "Corsair Cat" },
+      { slug: "boba", name: "Boba" },
+      { slug: "quack", name: "Captain Quack" },
+    ];
+    const latestItems = [
+      { slug: "boba", name: "Boba fresh" },
+      { slug: "quack", name: "Captain Quack fresh" },
+      { slug: "corsair", name: "Corsair Cat fresh" },
+    ];
+
+    expect(refreshPinnedOrderItems(currentOrder, latestItems)).toEqual([
+      { slug: "corsair", name: "Corsair Cat fresh" },
+      { slug: "boba", name: "Boba fresh" },
+      { slug: "quack", name: "Captain Quack fresh" },
+    ]);
   });
 });

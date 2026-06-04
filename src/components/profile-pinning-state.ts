@@ -30,6 +30,19 @@ export function hasSamePinnedOrder(left: string[], right: string[]): boolean {
   );
 }
 
+export function refreshPinnedOrderItems<T extends { slug: string }>(
+  currentOrder: T[],
+  latestItems: T[],
+): T[] {
+  const latestBySlug = new Map(latestItems.map((item) => [item.slug, item]));
+  const nextOrder = currentOrder
+    .map((item) => latestBySlug.get(item.slug))
+    .filter((item): item is T => Boolean(item));
+  const nextSlugs = new Set(nextOrder.map((item) => item.slug));
+  const appendedItems = latestItems.filter((item) => !nextSlugs.has(item.slug));
+  return [...nextOrder, ...appendedItems];
+}
+
 export function shouldResetPinnedOrderFromProps({
   previousPropSlugs,
   nextPropSlugs,

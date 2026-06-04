@@ -34,6 +34,7 @@ import { MAX_PINNED_PETS } from "@/lib/profiles";
 import { PetCard } from "@/components/pet-gallery";
 import {
   hasSamePinnedOrder,
+  refreshPinnedOrderItems,
   shouldResetPinnedOrderFromProps,
 } from "@/components/profile-pinning-state";
 
@@ -113,6 +114,9 @@ export function PinnedReorderGrid({
         currentOrderSlugs,
       })
     ) {
+      const refreshedOrder = refreshPinnedOrderItems(orderRef.current, pets);
+      orderRef.current = refreshedOrder;
+      setOrder(refreshedOrder);
       if (propOrderChanged) setSavedSlugs(slugs);
       return;
     }
