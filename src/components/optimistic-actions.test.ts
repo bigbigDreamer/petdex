@@ -35,6 +35,7 @@ describe("optimistic lightweight actions", () => {
   it("does not duplicate favorite state with the old caught dot", () => {
     expect(petGallerySource).not.toContain("CheckCircle2");
     expect(petGallerySource).not.toContain("caughtTitle");
-    expect(petGallerySource).not.toContain("caught={");
+    expect(petGallerySource).toContain("initialLiked={caught}");
+    expect(petCardFooterSource).toContain("setLiked(initialLiked)");
   });
 });

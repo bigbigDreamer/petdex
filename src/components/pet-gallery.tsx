@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils";
 import { track } from "@/lib/vercel-analytics";
 
 import { FeedAdSlot } from "@/components/ads/feed-ad-slot";
+import { useHeaderState } from "@/components/header-state-provider";
 import { PetActionMenu } from "@/components/pet-action-menu";
 import { PetCardFooter } from "@/components/pet-card-footer";
 import { PetSprite } from "@/components/pet-sprite";
@@ -138,9 +139,8 @@ export function PetGallery({
   const [activeBatches, setActiveBatches] = useState<Set<string>>(new Set());
   const [sort, setSort] = useState<SortKey>("alpha");
   const [sortTouched, setSortTouched] = useState(false);
-  // Kept for call-site compatibility; card favorite state is already shown by
-  // the heart button, so we no longer duplicate it with a caught dot.
-  void caughtSlugs;
+  const headerCaught = useHeaderState().state.caught;
+  const caughtSet = new Set(caughtSlugs ?? headerCaught);
 
   const [pets, setPets] = useState<PetWithMetrics[]>(initial.pets);
   const [total, setTotal] = useState<number>(initial.total);
@@ -577,6 +577,7 @@ export function PetGallery({
                 index={index}
                 stateCount={stateCount}
                 dexNumber={dexMap?.[pet.slug] ?? null}
+                caught={caughtSet.has(pet.slug)}
               />
               {ad ? <FeedAdSlot ad={ad} /> : null}
             </Fragment>
@@ -781,6 +782,8 @@ export type PetCardPinState = {
 type PetCardProps = {
   pet: PetWithMetrics;
   index: number;
+  /** User has already favorited/caught this pet; shown by the heart button. */
+  caught?: boolean;
   /**
    * Optional. Kept on the type so older call sites that still pass
    * stateCount don't break. The card no longer renders a 'states'
@@ -832,6 +835,7 @@ function PetCardImpl({
   pet,
   index,
   dexNumber,
+  caught,
   ownerActions,
   statusOverlay,
   pinState,
@@ -1041,6 +1045,7 @@ function PetCardImpl({
           soundUrl={pet.soundUrl}
           installCount={installCount}
           likeCount={likeCount}
+          initialLiked={caught}
         />
       </div>
 

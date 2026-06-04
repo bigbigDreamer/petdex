@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { memo, useCallback, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 import { useClerk } from "@clerk/nextjs";
 import { Download, Heart, Share2, TerminalSquare } from "lucide-react";
@@ -49,6 +49,10 @@ function PetCardFooterImpl({
   const likeRequestSeq = useRef(0);
   const formattedLikeCount = formatLocalizedNumber(count, locale);
   const formattedInstallCount = formatLocalizedNumber(installCount, locale);
+
+  useEffect(() => {
+    if (typeof initialLiked === "boolean") setLiked(initialLiked);
+  }, [initialLiked]);
 
   const toggleLike = useCallback(
     async (e: React.MouseEvent) => {
