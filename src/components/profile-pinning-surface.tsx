@@ -17,6 +17,10 @@ import type { Submission } from "@/components/my-pets-view";
 import type { OwnerCollection } from "@/components/owner-collections-manager";
 import { PetCard } from "@/components/pet-gallery";
 import { PetSprite } from "@/components/pet-sprite";
+import {
+  applyPinChangeToPinnedSlugs,
+  applyPinnedOrderChange,
+} from "@/components/profile-pinning-state";
 import { ProfileTabs } from "@/components/profile-tabs";
 
 type OwnerPinnedReorderGridProps = {
@@ -25,6 +29,8 @@ type OwnerPinnedReorderGridProps = {
   hideAuthor?: boolean;
   onPinChange?: (slug: string, isPinned: boolean) => void;
   onOrderChange?: (slugs: string[]) => void;
+  pinActionsDisabled?: boolean;
+  onOrderSavePendingChange?: (isPending: boolean) => void;
 };
 
 const OwnerPinnedReorderGrid = dynamic<OwnerPinnedReorderGridProps>(
@@ -70,6 +76,7 @@ export function ProfilePinningSurface({
   const t = useTranslations("profile");
   const [optimisticPinnedSlugs, setOptimisticPinnedSlugs] =
     useState(initialPinnedSlugs);
+  const [pinActionsLocked, setPinActionsLocked] = useState(false);
 
   useEffect(() => {
     setOptimisticPinnedSlugs(initialPinnedSlugs);
@@ -90,13 +97,9 @@ export function ProfilePinningSurface({
   const handlePinChange = useCallback(
     (slug: string, nextPinned: boolean) => {
       if (!isOwner) return;
-      setOptimisticPinnedSlugs((current) => {
-        const normalizedSlug = slug.toLowerCase();
-        const withoutSlug = current.filter((item) => item !== normalizedSlug);
-        if (!nextPinned) return withoutSlug;
-        if (withoutSlug.length >= MAX_PINNED_PETS) return current;
-        return [...withoutSlug, normalizedSlug];
-      });
+      setOptimisticPinnedSlugs((current) =>
+        applyPinChangeToPinnedSlugs(current, slug, nextPinned, MAX_PINNED_PETS),
+      );
     },
     [isOwner],
   );
@@ -104,7 +107,17 @@ export function ProfilePinningSurface({
   const handlePinOrderChange = useCallback(
     (slugs: string[]) => {
       if (!isOwner) return;
-      setOptimisticPinnedSlugs(slugs);
+      setOptimisticPinnedSlugs((current) =>
+        applyPinnedOrderChange(current, slugs),
+      );
+    },
+    [isOwner],
+  );
+
+  const handleOrderSavePendingChange = useCallback(
+    (isPending: boolean) => {
+      if (!isOwner) return;
+      setPinActionsLocked(isPending);
     },
     [isOwner],
   );
@@ -119,6 +132,8 @@ export function ProfilePinningSurface({
             hideAuthor
             onPinChange={handlePinChange}
             onOrderChange={handlePinOrderChange}
+            pinActionsDisabled={pinActionsLocked}
+            onOrderSavePendingChange={handleOrderSavePendingChange}
           />
         ) : (
           <div className="space-y-4">
@@ -171,6 +186,7 @@ export function ProfilePinningSurface({
                 pinnedSlugs: validPinnedSlugs,
                 maxPins: MAX_PINNED_PETS,
                 onPinChange: handlePinChange,
+                pinActionsDisabled: pinActionsLocked,
               }
             : null
         }

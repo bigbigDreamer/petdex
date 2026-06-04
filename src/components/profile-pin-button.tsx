@@ -15,6 +15,8 @@ export function ProfilePinButton({
   maxPins,
   appearance = "default",
   onOptimisticChange,
+  disabled,
+  disabledTitle,
 }: {
   slug: string;
   isPinned: boolean;
@@ -22,6 +24,8 @@ export function ProfilePinButton({
   maxPins: number;
   appearance?: "default" | "subtle";
   onOptimisticChange?: (isPinned: boolean) => void;
+  disabled?: boolean;
+  disabledTitle?: string;
 }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
@@ -40,6 +44,7 @@ export function ProfilePinButton({
   async function toggle(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
+    if (disabled) return;
     if (capReached) {
       alert(`You can pin up to ${maxPins} pets. Unpin one first.`);
       return;
@@ -84,17 +89,19 @@ export function ProfilePinButton({
     }
   }
 
-  const title = optimisticPinned
-    ? "Unpin from profile"
-    : capReached
-      ? `Pin cap reached (${maxPins})`
-      : "Pin to profile";
+  const title = disabled
+    ? (disabledTitle ?? "Pin controls are temporarily unavailable")
+    : optimisticPinned
+      ? "Unpin from profile"
+      : capReached
+        ? `Pin cap reached (${maxPins})`
+        : "Pin to profile";
 
   return (
     <button
       type="button"
       onClick={toggle}
-      disabled={capReached}
+      disabled={disabled || capReached}
       title={title}
       aria-label={title}
       style={{ zIndex: 30 }}

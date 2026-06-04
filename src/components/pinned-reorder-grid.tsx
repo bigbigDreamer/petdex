@@ -39,6 +39,8 @@ type PinnedReorderGridProps = {
   hideAuthor?: boolean;
   onPinChange?: (slug: string, isPinned: boolean) => void;
   onOrderChange?: (slugs: string[]) => void;
+  pinActionsDisabled?: boolean;
+  onOrderSavePendingChange?: (isPending: boolean) => void;
 };
 
 type SaveState = "idle" | "saving" | "saved" | "error";
@@ -71,6 +73,8 @@ export function PinnedReorderGrid({
   hideAuthor,
   onPinChange,
   onOrderChange,
+  pinActionsDisabled,
+  onOrderSavePendingChange,
 }: PinnedReorderGridProps) {
   const t = useTranslations("pinnedReorder");
   const orderRef = useRef<PetWithMetrics[]>(pets);
@@ -132,6 +136,7 @@ export function PinnedReorderGrid({
 
   async function saveOrder(nextOrder: PetWithMetrics[]) {
     setSaveState("saving");
+    onOrderSavePendingChange?.(true);
     setError(null);
     try {
       const slugs = nextOrder.map((pet) => pet.slug);
@@ -152,6 +157,8 @@ export function PinnedReorderGrid({
     } catch (err) {
       setSaveState("error");
       setError((err as Error).message);
+    } finally {
+      onOrderSavePendingChange?.(false);
     }
   }
 
@@ -287,6 +294,7 @@ export function PinnedReorderGrid({
                 pinnedCount={order.length}
                 hideAuthor={hideAuthor}
                 onPinChange={onPinChange}
+                pinActionsDisabled={pinActionsDisabled || isSaving}
               />
             ))}
           </div>
@@ -327,6 +335,7 @@ type SortablePinnedPetProps = {
   pinnedCount: number;
   hideAuthor?: boolean;
   onPinChange?: (slug: string, isPinned: boolean) => void;
+  pinActionsDisabled?: boolean;
 };
 
 function SortablePinnedPet({
@@ -338,6 +347,7 @@ function SortablePinnedPet({
   pinnedCount,
   hideAuthor,
   onPinChange,
+  pinActionsDisabled,
 }: SortablePinnedPetProps) {
   const {
     attributes,
@@ -377,6 +387,8 @@ function SortablePinnedPet({
             pinnedCount,
             maxPins: MAX_PINNED_PETS,
             onPinChange: (isPinned) => onPinChange?.(pet.slug, isPinned),
+            disabled: pinActionsDisabled,
+            disabledTitle: "Pinned order is saving",
           }}
           actionMode="profilePinHover"
         />

@@ -779,6 +779,9 @@ export type PetCardPinState = {
   maxPins: number;
   /** Mirrors the button's optimistic state into parent-owned layouts. */
   onPinChange?: (isPinned: boolean) => void;
+  /** Temporarily prevents pin writes while another full-list pin save is in flight. */
+  disabled?: boolean;
+  disabledTitle?: string;
 };
 
 type PetCardProps = {
@@ -1076,6 +1079,8 @@ function PetCardImpl({
               maxPins={pinState.maxPins}
               appearance="subtle"
               onOptimisticChange={pinState.onPinChange}
+              disabled={pinState.disabled}
+              disabledTitle={pinState.disabledTitle}
             />
           ) : null}
           <PetActionMenu
@@ -1102,6 +1107,8 @@ function PetCardImpl({
                 pinnedCount={pinState.pinnedCount}
                 maxPins={pinState.maxPins}
                 onOptimisticChange={pinState.onPinChange}
+                disabled={pinState.disabled}
+                disabledTitle={pinState.disabledTitle}
               />
             </div>
           ) : null}

@@ -54,6 +54,7 @@ export type ProfileTabsProps = {
     pinnedSlugs: string[];
     maxPins: number;
     onPinChange?: (slug: string, isPinned: boolean) => void;
+    pinActionsDisabled?: boolean;
   } | null;
   // Owner-only: every collection this user owns (personal + featured).
   // When present and isOwner, the Collections tab swaps to the multi
@@ -178,6 +179,7 @@ export function ProfileTabs(props: ProfileTabsProps) {
           pinnedCount={pinnedCount}
           maxPins={pinning?.maxPins ?? null}
           onPinChange={pinning?.onPinChange}
+          pinActionsDisabled={pinning?.pinActionsDisabled}
           isZh={isZh}
           approvedLabel={(count: number) => t("approvedSection", { count })}
         />
@@ -213,6 +215,7 @@ function PetsPanel({
   pinnedCount,
   maxPins,
   onPinChange,
+  pinActionsDisabled,
   isZh,
   approvedLabel,
 }: {
@@ -226,6 +229,7 @@ function PetsPanel({
   pinnedCount: number;
   maxPins: number | null;
   onPinChange?: (slug: string, isPinned: boolean) => void;
+  pinActionsDisabled?: boolean;
   isZh: boolean;
   approvedLabel: (count: number) => string;
 }) {
@@ -298,6 +302,8 @@ function PetsPanel({
                             maxPins,
                             onPinChange: (isPinned) =>
                               onPinChange?.(pet.slug, isPinned),
+                            disabled: pinActionsDisabled,
+                            disabledTitle: "Pinned order is saving",
                           }
                         : undefined
                     }
