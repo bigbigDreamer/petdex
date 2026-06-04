@@ -17,7 +17,6 @@ import type { OwnerCollection } from "@/components/owner-collections-manager";
 import { PetCard } from "@/components/pet-gallery";
 import { PetSprite } from "@/components/pet-sprite";
 import { PinnedReorderGrid } from "@/components/pinned-reorder-grid";
-import { ProfilePinButton } from "@/components/profile-pin-button";
 import { ProfileTabs } from "@/components/profile-tabs";
 
 type ProfilePinningSurfaceProps = {
@@ -89,7 +88,7 @@ export function ProfilePinningSurface({
   return (
     <>
       {featuredPets.length > 0 ? (
-        isOwner && featuredPets.length >= 2 ? (
+        isOwner ? (
           <PinnedReorderGrid
             pets={featuredPets}
             petStateCount={petStates.length}
@@ -113,19 +112,6 @@ export function ProfilePinningSurface({
                   locale={locale}
                   installsLabel={(count: string) => t("installs", { count })}
                 />
-                {isOwner ? (
-                  <div className="absolute top-4 right-4 z-40">
-                    <ProfilePinButton
-                      slug={featuredPets[0].slug}
-                      isPinned
-                      pinnedCount={featuredPets.length}
-                      maxPins={MAX_PINNED_PETS}
-                      onOptimisticChange={(nextPinned) =>
-                        handlePinChange(featuredPets[0].slug, nextPinned)
-                      }
-                    />
-                  </div>
-                ) : null}
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-6">
